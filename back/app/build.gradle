@@ -18,11 +18,17 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
     implementation libs.guava
+    implementation libs.assertj.core
+    implementation libs.jackson.databind
+    implementation libs.jakarta.ws.rs.api
+    implementation libs.aws.lambda.core
+    implementation libs.aws.lambda.events
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -34,7 +40,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'nine.spades.calendrical.App'
+    mainClass = 'nine.spades.soho.App'
 }
 
 tasks.named('test') {

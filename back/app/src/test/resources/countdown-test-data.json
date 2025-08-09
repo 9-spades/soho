@@ -1,0 +1,44 @@
+[
+  {
+    "testName": "shouldCalculateCountdownBetweenDates",
+    "nowZonedDateTime": "2024-01-01T10:00:00Z[UTC]",
+    "targetZonedDateTime": "2024-01-02T12:03:04Z[UTC]",
+    "expected": [4, 3, 2, 1]
+  },
+  {
+    "testName": "shouldHandleExpiredCountdown",
+    "nowZonedDateTime": "2024-01-02T10:00:00Z[UTC]",
+    "targetZonedDateTime": "2024-01-01T10:00:00Z[UTC]",
+    "expected": [0, 0, 0, 0]
+  },
+  {
+    "testName": "shouldHandleTimezoneDifferences",
+    "nowZonedDateTime": "2024-01-01T12:00:00Z[UTC]",
+    "targetZonedDateTime": "2024-01-01T20:00:00-05:00[America/New_York]",
+    "expected": [0, 0, 13, 0]
+  },
+  {
+    "testName": "shouldCalculateExactSameTimeAsZero",
+    "nowZonedDateTime": "2024-01-01T12:30:45Z[UTC]",
+    "targetZonedDateTime": "2024-01-01T12:30:45Z[UTC]",
+    "expected": [0, 0, 0, 0]
+  },
+  {
+    "testName": "shouldHandleLeapYearCalculations",
+    "nowZonedDateTime": "2024-02-28T00:00:00Z[UTC]",
+    "targetZonedDateTime": "2024-03-01T00:00:00Z[UTC]",
+    "expected": [0, 0, 0, 2]
+  },
+  {
+    "testName": "shouldCalculateLargeTimeDifferences",
+    "nowZonedDateTime": "2024-01-01T00:00:00Z[UTC]",
+    "targetZonedDateTime": "2025-01-01T00:00:00Z[UTC]",
+    "expected": [0, 0, 0, 366]
+  },
+  {
+    "testName": "shouldHandleSecondsEdgeCase",
+    "nowZonedDateTime": "2024-01-01T12:30:01Z[UTC]",
+    "targetZonedDateTime": "2024-01-01T12:31:00Z[UTC]",
+    "expected": [59, 0, 0, 0]
+  }
+]
