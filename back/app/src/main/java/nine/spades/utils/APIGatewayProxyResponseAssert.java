@@ -27,9 +27,9 @@ public class APIGatewayProxyResponseAssert
     /**
      * Verifies the response status code
      */
-    public APIGatewayProxyResponseAssert hasStatus(int expectedStatus) {
-        if(actual.getStatusCode() != expectedStatus)
-            failWithMessage("Expected status <%d> but was <%d>", expectedStatus, actual.getStatusCode());
+    public APIGatewayProxyResponseAssert hasStatus(Status expectedStatus) {
+        if(actual.getStatusCode() != expectedStatus.getStatusCode())
+            failWithMessage("Expected status <%d> but was <%d>", expectedStatus.getStatusCode(), actual.getStatusCode());
         return this;
     }
     
@@ -47,7 +47,7 @@ public class APIGatewayProxyResponseAssert
      */
     public APIGatewayProxyResponseAssert hasBody(String expectedBody) {
         hasNonNullBody();
-        if(!actual.getBody().equals(expectedBody));
+        if(!actual.getBody().equals(expectedBody))
             failWithMessage("Expected body <%s> but was <%s>", expectedBody, actual.getBody());
         return this;
     }
@@ -118,31 +118,31 @@ public class APIGatewayProxyResponseAssert
      * Convenience methods for common status codes
      */
     public APIGatewayProxyResponseAssert isOk() {
-        return hasStatus(Status.OK.getStatusCode());
+        return hasStatus(Status.OK);
     }
     
     public APIGatewayProxyResponseAssert isCreated() {
-        return hasStatus(Status.CREATED.getStatusCode());
+        return hasStatus(Status.CREATED);
     }
     
     public APIGatewayProxyResponseAssert isBadRequest() {
-        return hasStatus(Status.BAD_REQUEST.getStatusCode());
+        return hasStatus(Status.BAD_REQUEST);
     }
     
     public APIGatewayProxyResponseAssert isUnauthorized() {
-        return hasStatus(Status.UNAUTHORIZED.getStatusCode());
+        return hasStatus(Status.UNAUTHORIZED);
     }
     
     public APIGatewayProxyResponseAssert isForbidden() {
-        return hasStatus(Status.FORBIDDEN.getStatusCode());
+        return hasStatus(Status.FORBIDDEN);
     }
     
     public APIGatewayProxyResponseAssert isNotFound() {
-        return hasStatus(Status.NOT_FOUND.getStatusCode());
+        return hasStatus(Status.NOT_FOUND);
     }
     
     public APIGatewayProxyResponseAssert isInternalServerError() {
-        return hasStatus(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        return hasStatus(Status.INTERNAL_SERVER_ERROR);
     }
 
     /**

@@ -40,6 +40,6 @@ class CountdownTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("timeWindows")
     void shouldComputeTimeUntilTarget(String testName, ZonedDateTime now, ZonedDateTime target, List<Integer> expected) {
-        assertEquals(expected, Countdown.calculateCountdown(now, target));
+        assertEquals(expected, Countdown.compute(now, target));
     }
 }

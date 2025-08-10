@@ -1,107 +1,66 @@
 package nine.spades.soho.aws;
 
+import java.time.*;
+import java.time.zone.ZoneRulesException;
+import java.util.*;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.amazonaws.services.lambda.runtime.events.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nine.spades.time.Countdown;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import nine.spades.time.Countdown;
+import nine.spades.utils.*;
 
 public class CountdownHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    // query params
-    public static final String TARGET_DATE = "targetDate";
+    public static final String DEFAULT_TIMEZONE = "UTC";
+    public static final String TARGET_DATE = "targetDate"; // query params
     public static final String TIMEZONE = "timezone";
-    // msgs
-    public static final String MISSING_TARGET_DATE = "targetDate parameter is required";
-    public static final String INVALID_TARGET_DATE = "Invalid date format";
-    public static final String INVALID_TIMEZONE = "Invalid timezone";
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Countdown countdown = new Countdown();
+    public static final String MISSING_TARGET_DATE = "Query parameter 'targetDate' is required"; // msgs
+    public static final String INVALID_TARGET_DATE = "Invalid 'targetDate' format";
+    public static final String INVALID_TIMEZONE = "Invalid 'timezone'";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
-        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
-        
-        // Set CORS headers
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Access-Control-Allow-Origin", "*");
-        headers.put("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        headers.put("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        response.setHeaders(headers);
-
+        if(HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
+            return APIGatewayProxyResponseBuilder.builder()
+                .corsHeaders()
+                .header(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, String.format("%s, %s", HttpMethod.GET, HttpMethod.OPTIONS))
+                .header(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, HttpHeaders.CONTENT_TYPE)
+                .status(Response.Status.OK)
+                .build();
+        }
+        Map<String, String> queryParams = request.getQueryStringParameters();
+        if(queryParams == null || queryParams.get(TARGET_DATE) == null || queryParams.get(TARGET_DATE).isEmpty())
+            return APIGatewayProxyResponseBuilder.createErrorResponse(Response.Status.BAD_REQUEST, MISSING_TARGET_DATE);
+        String targetDate = queryParams.get(TARGET_DATE), timezone = queryParams.getOrDefault(TIMEZONE, DEFAULT_TIMEZONE);
         try {
-            // Handle OPTIONS request for CORS preflight
-            if ("OPTIONS".equals(request.getHttpMethod())) {
-                response.setStatusCode(200);
-                response.setBody("");
-                return response;
-            }
-
-            // Get query parameters
-            Map<String, String> queryParams = request.getQueryStringParameters();
-            if (queryParams == null) {
-                return createErrorResponse(400, "targetDate parameter is required");
-            }
-
-            String targetDateStr = queryParams.get("targetDate");
-            if (targetDateStr == null || targetDateStr.isEmpty()) {
-                return createErrorResponse(400, "targetDate parameter is required");
-            }
-
-            String timezone = queryParams.getOrDefault("timezone", "UTC");
-
-            // TODO: Implement actual countdown calculation
-            countdown.wait(1000);
-            // For now, return a stub response
-            CountdownResponse countdownResponse = CountdownResponse.builder()
-                .days(0)
-                .hours(0)
-                .minutes(0)
-                .seconds(0)
-                .targetDate(targetDateStr)
+            List<Integer> countdown = Countdown.compute(ZonedDateTime.now(), LocalDateTime.parse(targetDate).atZone(ZoneId.of(timezone)));
+            CountdownResponse body = CountdownResponse.builder()
+                .days(countdown.get(0))
+                .hours(countdown.get(1))
+                .minutes(countdown.get(2))
+                .seconds(countdown.get(3))
+                .targetDate(targetDate)
                 .timezone(timezone)
                 .build();
-
-            response.setStatusCode(200);
-            response.setBody(objectMapper.writeValueAsString(countdownResponse));
-
-        } catch (Exception e) {
-            context.getLogger().log("Error: " + e.getMessage());
-            if (e.getMessage().contains("Invalid date format")) {
-                return createErrorResponse(400, "Invalid date format");
-            } else if (e.getMessage().contains("Invalid timezone")) {
-                return createErrorResponse(400, "Invalid timezone");
-            } else {
-                return createErrorResponse(500, "Internal server error");
-            }
+            return APIGatewayProxyResponseBuilder.builder()
+                .corsHeaders()
+                .body(OBJECT_MAPPER.writeValueAsString(body))
+                .contentTypeJson()
+                .status(Response.Status.OK)
+                .build();
+        } catch(ZoneRulesException ignore) {
+            return APIGatewayProxyResponseBuilder.createErrorResponse(Response.Status.BAD_REQUEST, INVALID_TIMEZONE);
+        } catch(DateTimeException ignore) {
+            return APIGatewayProxyResponseBuilder.createErrorResponse(Response.Status.BAD_REQUEST , INVALID_TARGET_DATE);
+        } catch(JsonProcessingException exception) {
+            context.getLogger().log(exception.getMessage());
+            return APIGatewayProxyResponseBuilder.createErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, null);
         }
-
-        return response;
-    }
-
-    private APIGatewayProxyResponseEvent createErrorResponse(int statusCode, String message) {
-        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
-        response.setStatusCode(statusCode);
-        
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Access-Control-Allow-Origin", "*");
-        response.setHeaders(headers);
-        
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put("error", message);
-        
-        try {
-            response.setBody(objectMapper.writeValueAsString(errorBody));
-        } catch (Exception e) {
-            response.setBody("{\"error\":\"" + message + "\"}");
-        }
-        
-        return response;
     }
 }

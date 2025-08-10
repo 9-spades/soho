@@ -1,7 +1,8 @@
 package nine.spades.soho.aws;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.*;
 
 public class CountdownResponse {
     private final int days;
@@ -13,12 +14,13 @@ public class CountdownResponse {
 
     @JsonCreator
     public CountdownResponse(
-            @JsonProperty("days") int days,
-            @JsonProperty("hours") int hours,
-            @JsonProperty("minutes") int minutes,
-            @JsonProperty("seconds") int seconds,
-            @JsonProperty("targetDate") String targetDate,
-            @JsonProperty("timezone") String timezone) {
+        @JsonProperty("days") int days,
+        @JsonProperty("hours") int hours,
+        @JsonProperty("minutes") int minutes,
+        @JsonProperty("seconds") int seconds,
+        @JsonProperty("targetDate") String targetDate,
+        @JsonProperty("timezone") String timezone
+    ) {
         this.days = days;
         this.hours = hours;
         this.minutes = minutes;
@@ -28,9 +30,13 @@ public class CountdownResponse {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(days, hours, minutes, seconds, targetDate, timezone);
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        // TODO implementation
-        return false;
+        return obj != null && getClass() == obj.getClass() && hashCode() == obj.hashCode();
     }
 
     public int getDays() {

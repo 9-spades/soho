@@ -48,12 +48,12 @@ class CountdownHandlerTest {
         response = givenWhen(testTargetDate(+1), null);
 
         // Then
-        assertThat(response).isOk().hasCorsHeaders().hasHeader(MediaType.APPLICATION_JSON).hasValidJsonBody()
-            .bodyContains("\"timezone\": \"UTC\"")
-            .bodyMatches("\"days\": \\d+")
-            .bodyMatches("\"hours\": \\d+")
-            .bodyMatches("\"minutes\": \\d+")
-            .bodyMatches("\"seconds\": \\d+");
+        assertThat(response).isOk().hasCorsHeaders().hasHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON).hasValidJsonBody()
+            .bodyContains("\"timezone\":\"UTC\"")
+            .bodyMatches(".*\"days\":\\d+.*")
+            .bodyMatches(".*\"hours\":\\d+.*")
+            .bodyMatches(".*\"minutes\":\\d+.*")
+            .bodyMatches(".*\"seconds\":\\d+.*");
     }
 
     @Test void shouldHandleMissingTargetDate() {
@@ -75,11 +75,11 @@ class CountdownHandlerTest {
         // When Then
         assertThat(HANDLER.handleRequest(request, context)).isOk().hasCorsHeaders()
             .hasHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, String.format("%s, %s", HttpMethod.GET, HttpMethod.OPTIONS))
-            .hasHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, String.format("%s, %s", HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION));
+            .hasHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, HttpHeaders.CONTENT_TYPE);
     }
 
     @Test void shouldHandleExpiredCountdown() throws Exception {
-        assertThat(givenWhen(testTargetDate(-1), null)).isOk().hasHeader(MediaType.APPLICATION_JSON)
+        assertThat(givenWhen(testTargetDate(-1), null)).isOk().hasHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
             .hasJsonField("/days", "0")
             .hasJsonField("/hours", "0")
             .hasJsonField("/minutes", "0")
@@ -87,7 +87,7 @@ class CountdownHandlerTest {
     }
 
     @Test void shouldHandleDifferentTimezoneFormats() throws Exception {
-        assertThat(givenWhen(testTargetDate(0), CountdownResponseTest.TIMEZONE)).isOk().hasHeader(MediaType.APPLICATION_JSON)
+        assertThat(givenWhen(testTargetDate(0), CountdownResponseTest.TIMEZONE)).isOk().hasHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
             .hasJsonField("/timezone", CountdownResponseTest.TIMEZONE);
     }
 }
