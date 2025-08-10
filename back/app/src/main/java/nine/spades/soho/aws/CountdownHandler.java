@@ -41,10 +41,10 @@ public class CountdownHandler implements RequestHandler<APIGatewayProxyRequestEv
         try {
             List<Integer> countdown = Countdown.compute(ZonedDateTime.now(), LocalDateTime.parse(targetDate).atZone(ZoneId.of(timezone)));
             CountdownResponse body = CountdownResponse.builder()
-                .days(countdown.get(0))
-                .hours(countdown.get(1))
-                .minutes(countdown.get(2))
-                .seconds(countdown.get(3))
+                .seconds(countdown.get(0))
+                .minutes(countdown.get(1))
+                .hours(countdown.get(2))
+                .days(countdown.get(3))
                 .targetDate(targetDate)
                 .timezone(timezone)
                 .build();
