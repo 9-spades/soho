@@ -1,0 +1,68 @@
+body {
+    font-family: Verdana;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 1rem;
+    box-shadow: 0 0.5rem 2rem 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    max-width: 720px;
+    width: 100%;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.target-date {
+    font-size: 1.2rem;
+    opacity: 0.7;
+    margin-bottom: 3rem;
+}
+
+.countdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+}
+
+.time-unit {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.time-unit:hover {
+    transform: translateY(-0.5rem);
+    box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.time-value {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0.125rem 0.125rem 0.125rem rgba(0, 0, 0, 0.3);
+}
+
+.time-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
