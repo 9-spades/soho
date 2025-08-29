@@ -62,6 +62,7 @@ class Countdown {
             if(this.status.days < 0) {
                 this.status.days = 0;
                 clearInterval(this.interval);
+                return;
             }
             this.update();
         }, 1000);
